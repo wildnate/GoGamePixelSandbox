@@ -8,85 +8,101 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
+var PlayerXMain, PlayerYMain float64
+
+const PlayerTileSize = 96
+
 type Sprite struct {
-	Img  *ebiten.Image
-	X, Y float64
+	Img      *ebiten.Image
+	X, Y     float64
+	tilesize float64
 }
 type Enemy struct {
-	*Sprite
+	Img           *ebiten.Image
+	X, Y          float64
+	tilesize      float64
 	FollowsPlayer bool
+	anim          Animation
+}
+type Player struct {
+	playerImage *ebiten.Image
+	X, Y        float64
+	tilesize    float64
+	anim        Animation
 }
 
 type Game struct {
-	animation        Animation
-	img              *ebiten.Image
-	playerX, PlayerY float64
-	playerImage      *ebiten.Image
-	player           *Sprite
-	sprites          []*Sprite
-	enemies          []*Enemy
+	animation Animation
+	img       *ebiten.Image
+	Player    *Player
+	sprites   []*Sprite
+	enemies   []*Enemy
+}
+type Animation struct {
+	First, Last, Cur, Speed, Elapsed int
 }
 
 func (g *Game) Update() error {
-	g.animation.Update()
+	g.Player.anim.Update()
+	for _, e := range g.enemies {
+		e.anim.Update()
+		if e.FollowsPlayer {
+			// chase logic, etc.
+		}
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		g.PlayerY += 2
+		g.Player.X += 2
+		PlayerXMain = g.Player.X
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		g.PlayerY -= 2
+		g.Player.X -= 2
+		PlayerXMain = g.Player.X
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		g.playerX += 2
+		g.Player.Y += 2
+		PlayerYMain = g.Player.Y
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		g.playerX -= 2
+		g.Player.Y -= 2
+		PlayerYMain = g.Player.Y
 	}
 
 	return nil
 
 }
 
-type Animation struct {
-	First, Last, Cur, Speed, Elapsed int
-}
-
 // PlayerTileSize is the width/height of a single animation frame in pixels.
 // Adjust this to match your spritesheet.
-const PlayerTileSize = 96
 
-func (a *Animation) Frame(spriteSheetWidthTiles int) image.Rectangle {
+func (a *Animation) Frame(spriteSheetWidthTiles, tilesize int) image.Rectangle {
 	tx := a.Cur % spriteSheetWidthTiles
 	ty := a.Cur / spriteSheetWidthTiles
 
-	px := tx * PlayerTileSize
-	py := ty * PlayerTileSize
+	px := tx * tilesize
+	py := ty * tilesize
 	// bottom-right coordinates are start + tilesize
-	return image.Rect(px, py, px+PlayerTileSize, py+PlayerTileSize)
+	return image.Rect(px, py, px+tilesize, py+tilesize)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Hello, World!")
 
 	opts := ebiten.DrawImageOptions{}
-	//opts.GeoM.Scale(6, 6)
-	opts.GeoM.Translate(g.playerX, g.PlayerY)
+	opts.GeoM.Translate(g.Player.Y, g.Player.X)
+
 	screen.DrawImage(
-		g.playerImage.SubImage(g.animation.Frame(4)).(*ebiten.Image),
+		g.Player.playerImage.
+			SubImage(g.Player.anim.Frame(4, PlayerTileSize)).(*ebiten.Image),
 		&opts,
 	)
 
-	opts.GeoM.Reset()
-	for _, sprite := range g.enemies {
-		opts.GeoM.Translate(sprite.X, sprite.Y)
-
+	for _, e := range g.enemies {
+		opts := ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(e.X, e.Y)
 		screen.DrawImage(
-			sprite.Img.SubImage(
-				image.Rect(0, 0, 128, 128),
-			).(*ebiten.Image),
+			e.Img.SubImage(e.anim.Frame(4, int(e.tilesize))).(*ebiten.Image),
 			&opts,
 		)
-
-		opts.GeoM.Reset()
 	}
 }
 
@@ -103,48 +119,44 @@ func (a *Animation) Update() {
 			a.Cur = a.First
 		}
 	}
-
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Hello, To My Game")
+	ebiten.SetWindowSize(1280, 720)
+	ebiten.SetWindowTitle("Game Main")
 	playerImage, _, err := ebitenutil.NewImageFromFile("assets/player/player-idle-96x96.png")
-	skeletonImage, _, err := ebitenutil.NewImageFromFile("assets/Skeleton_Sword/Skeleton_White/Skeleton_With_VFX/SkeletonIdle.png")
+	skeletonImage, _, err := ebitenutil.NewImageFromFile("assets/enemies/Skeleton.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	game := Game{
+
 		enemies: []*Enemy{
 			{
-				&Sprite{
-					Img: skeletonImage,
-					X:   100.0,
-					Y:   100.0,
-				},
-				true,
+
+				Img:           skeletonImage,
+				X:             100.0,
+				Y:             100.0,
+				tilesize:      64,
+				FollowsPlayer: false,
+				anim:          Animation{First: 0, Last: 4, Speed: 10},
 			},
 			{
-				&Sprite{
-					Img: skeletonImage,
-					X:   150.0,
-					Y:   50.0,
-				},
-				false,
+				Img:           skeletonImage,
+				X:             150.0,
+				Y:             50.0,
+				tilesize:      64,
+				FollowsPlayer: true,
+				anim:          Animation{First: 0, Last: 4, Speed: 10},
 			},
 		},
-		animation: Animation{
-			First: 0, // first frame index
-			Last:  3, // last frame index (0‑based)
-			Speed: 8, // advance every 8 updates; tweak to taste
-		},
-		playerImage: playerImage,
-
-		player: &Sprite{
-			Img: playerImage,
-			X:   100,
-			Y:   100,
+		Player: &Player{
+			tilesize:    96,
+			playerImage: playerImage,
+			X:           100,
+			Y:           100,
+			anim:        Animation{First: 0, Last: 4, Speed: 6},
 		},
 	}
 
