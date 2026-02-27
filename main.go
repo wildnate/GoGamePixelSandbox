@@ -10,8 +10,6 @@ import (
 
 var PlayerXMain, PlayerYMain float64
 
-const PlayerTileSize = 96
-
 type Sprite struct {
 	Img      *ebiten.Image
 	X, Y     float64
@@ -92,7 +90,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	screen.DrawImage(
 		g.Player.playerImage.
-			SubImage(g.Player.anim.Frame(4, PlayerTileSize)).(*ebiten.Image),
+			SubImage(g.Player.anim.Frame(64, 96)).(*ebiten.Image),
 		&opts,
 	)
 
@@ -100,7 +98,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		opts := ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(e.X, e.Y)
 		screen.DrawImage(
-			e.Img.SubImage(e.anim.Frame(4, int(e.tilesize))).(*ebiten.Image),
+			e.Img.SubImage(e.anim.Frame(64, 96)).(*ebiten.Image),
 			&opts,
 		)
 	}
@@ -138,25 +136,25 @@ func main() {
 				Img:           skeletonImage,
 				X:             100.0,
 				Y:             100.0,
-				tilesize:      64,
+				tilesize:      0,
 				FollowsPlayer: false,
-				anim:          Animation{First: 0, Last: 4, Speed: 10},
+				anim:          Animation{First: 0, Last: 7, Speed: 10},
 			},
 			{
 				Img:           skeletonImage,
 				X:             150.0,
 				Y:             50.0,
-				tilesize:      64,
+				tilesize:      0,
 				FollowsPlayer: true,
-				anim:          Animation{First: 0, Last: 4, Speed: 10},
+				anim:          Animation{First: 0, Last: 7, Speed: 10},
 			},
 		},
 		Player: &Player{
-			tilesize:    96,
+			tilesize:    0,
 			playerImage: playerImage,
 			X:           100,
 			Y:           100,
-			anim:        Animation{First: 0, Last: 4, Speed: 6},
+			anim:        Animation{First: 0, Last: 3, Speed: 6},
 		},
 	}
 
