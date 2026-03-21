@@ -1,0 +1,42 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.wildnate.gogame"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="34" />
+10
+11    <application
+11-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:3:5-16:19
+12        android:debuggable="true"
+13        android:extractNativeLibs="true"
+14        android:label="GoGameAndroid"
+14-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:4:9-38
+15        android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+15-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:5:9-67
+16        <activity
+16-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:6:9-15:20
+17            android:name="com.wildnate.gogame.MainActivity"
+17-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:7:13-41
+18            android:configChanges="orientation|screenSize|keyboardHidden"
+18-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:10:13-74
+19            android:exported="true"
+19-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:8:13-36
+20            android:screenOrientation="landscape" >
+20-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:9:13-50
+21            <intent-filter>
+21-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:11:13-14:29
+22                <action android:name="android.intent.action.MAIN" />
+22-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:12:17-69
+22-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:12:25-66
+23
+24                <category android:name="android.intent.category.LAUNCHER" />
+24-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:13:17-77
+24-->/home/bulletmagnet/Desktop/GoGame/android/app/src/main/AndroidManifest.xml:13:27-74
+25            </intent-filter>
+26        </activity>
+27    </application>
+28
+29</manifest>
